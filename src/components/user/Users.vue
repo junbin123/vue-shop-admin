@@ -29,7 +29,7 @@
       <!-- 表格区域 -->
       <el-table
         :data="userlist"
-        border
+        :border="true"
         style="width: 100%;margin-top:15px"
         stripe
       >
@@ -49,16 +49,18 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" min-width="180">
-          <template>
+          <template slot-scope="scope">
             <el-button
               type="primary"
               icon="el-icon-edit"
               size="mini"
+              @click="showEditDialog(scope.row)"
             ></el-button>
             <el-button
               type="danger"
               icon="el-icon-delete"
               size="mini"
+              @click="deleteUserInfo(scope.row)"
             ></el-button>
             <el-tooltip
               effect="dark"
@@ -117,9 +119,38 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeUserDialog">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false"
+        <el-button type="primary" @click="addUserVisible = false"
           >确 定</el-button
         >
+      </span>
+    </el-dialog>
+    <!-- 修改用户对话框 -->
+    <el-dialog
+      title="修改用户"
+      :visible.sync="editUserVisible"
+      width="50%"
+      @close="editDialogClose"
+    >
+      <el-form
+        :model="editForm"
+        :rules="editFormRules"
+        ref="editFormRef"
+        label-width="70px"
+      >
+        <el-form-item label="用户名">
+          <el-input v-model="editForm.username" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="editForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="mobile">
+          <el-input v-model="editForm.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer">
+        <el-button @click="editUserVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveUserInfo">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -159,6 +190,22 @@ export default {
         email: "",
         mobile: ""
       },
+      editFormRules: {
+        email: [
+          { required: true, message: "请输入邮箱", trigger: "blur" },
+          {
+            validator: checkEmail,
+            trigger: "blur"
+          }
+        ],
+        mobile: [
+          { required: true, message: "请输入手机号", trigger: "blur" },
+          {
+            validator: checkMobile,
+            trigger: "blur"
+          }
+        ]
+      },
       addFormRules: {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
@@ -192,9 +239,17 @@ export default {
             trigger: "blur"
           }
         ]
+      },
+      editUserVisible: false,
+      editForm: {
+        id: 0,
+        username: "",
+        email: "",
+        mobile: ""
       }
     };
   },
+
   created() {
     this.getUserList();
   },
@@ -229,6 +284,66 @@ export default {
     closeUserDialog() {
       this.addUserVisible = false;
       this.$refs.addFormRef.resetFields();
+    },
+    // 显示修改用户对话框
+    async showEditDialog(userInfo) {
+      this.editUserVisible = true;
+      this.editForm = {
+        id: userInfo.id,
+        username: userInfo.username,
+        email: userInfo.email,
+        mobile: userInfo.mobile
+      };
+    },
+    // 修改用户信息按钮
+    saveUserInfo() {
+      this.$refs.editFormRef.validate(valid => {
+        if (!valid) return;
+        var index = 0;
+        this.userlist.forEach((ele, idx) => {
+          if (ele.id == this.editForm.id) {
+            index = idx;
+            return;
+          }
+        });
+        this.userlist[index].email = this.editForm.email;
+        this.userlist[index].mobile = this.editForm.mobile;
+        this.editUserVisible = false;
+        this.$message.success("用户信息修改成功");
+      });
+    },
+    // 监听修改用户对话框的关闭事件
+    editDialogClose() {
+      this.$refs.editFormRef.resetFields();
+    },
+    // 删除用户信息
+    deleteUserInfo(userInfo) {
+      this.$confirm("确定删除用户信息?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          // 删除用户信息
+          var index = 0;
+          this.userlist.forEach((ele, idx) => {
+            if (ele.id === userInfo.id) {
+              index = idx;
+              return;
+            }
+          });
+          this.userlist.splice(index, 1);
+          this.$message({
+            type: "success",
+            message: "删除成功!"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     }
   }
 };

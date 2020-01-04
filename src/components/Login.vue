@@ -80,6 +80,7 @@ export default {
               // 1. 登录成功后保存 token 到 sessionStorage
               // 2. 跳转到 Home 页面
               window.sessionStorage.setItem("token", res.data.token);
+              // window.sessionStorage.setItem("token", "dsafkjhdfkshj");
               this.$router.push("/home");
             });
         } catch (error) {
