@@ -34,6 +34,10 @@
 export default {
   data() {
     return {
+      tempForm: {
+        username: "admin",
+        password: "123456"
+      },
       // 表单数据绑定
       loginForm: {
         username: "",
@@ -56,26 +60,31 @@ export default {
     // 表单重置
     resetLoginForm() {
       this.$refs.loginFormRef.resetFields();
-      // console.log(this);
     },
     // 验证登录信息
     login() {
       this.$refs.loginFormRef.validate(async valid => {
         try {
           if (!valid) return;
-          const { data: res } = await this.$http.post("login", this.loginForm);
-          console.log(res);
-          if (res.code !== 200) {
-            return this.$message.error("登录失败！");
-          }
-          this.$message.success("登录成功！");
-          // 1. 登录成功后保存 token 到 sessionStorage
-          // 2. 跳转到 Home 页面
-          window.sessionStorage.setItem("token", res.data.token);
-          this.$router.push("/home");
+          this.$http
+            .post("login", this.loginForm, {
+              headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            })
+            .then(response => {
+              const res = response.data;
+              console.log(res);
+              if (res.code !== 200) {
+                return this.$message.error("登录失败！");
+              }
+              this.$message.success("登录成功！");
+              // 1. 登录成功后保存 token 到 sessionStorage
+              // 2. 跳转到 Home 页面
+              window.sessionStorage.setItem("token", res.data.token);
+              this.$router.push("/home");
+            });
         } catch (error) {
           console.log(error.message);
-          this.$message.error("Easy-Mock 接口请求错误，稍后再试");
+          this.$message.error("接口请求错误，稍后再试");
         }
       });
     }
