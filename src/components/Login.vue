@@ -34,14 +34,10 @@
 export default {
   data() {
     return {
-      tempForm: {
-        username: "admin",
-        password: "123456"
-      },
       // 表单数据绑定
       loginForm: {
-        username: "",
-        password: ""
+        username: "admin",
+        password: "123456"
       },
       // 表单数据验证规则
       loginFormRules: {
