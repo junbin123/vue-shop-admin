@@ -6,6 +6,12 @@
 
 体验地址：https://junbin123.github.io/vue-shop-admin/
 
+### 注意
+
+由于 Yapi 不支持 HTTPS，部分浏览器可能会拦截请求，导致无法进入项目。需要手动点击「加载不安全的脚本」，例如 Chrome 浏览器：
+
+![](https://raw.githubusercontent.com/junbin123/blog-img/master/img/20200106105423.png)
+
 ### 截图
 
 ![](https://raw.githubusercontent.com/junbin123/blog-img/master/img/20200106104151.png)
